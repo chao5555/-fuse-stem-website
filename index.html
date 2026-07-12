@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FUSE STEM Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14232B;
+    --blueprint:#1F4E5F;
+    --blueprint-deep:#123241;
+    --blueprint-light:#4A8CA0;
+    --paper:#EEF3F2;
+    --paper-line: rgba(31,78,95,0.14);
+    --amber:#F2A93B;
+    --amber-deep:#D98A1A;
+    --green:#4C9A6A;
+    --white:#FBFBF9;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Sarabun', sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4,.display{
+    font-family:'Chakra Petch', sans-serif;
+    letter-spacing:0.01em;
+  }
+  .eyebrow{
+    font-family:'Chakra Petch', sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--blueprint-light);
+    font-weight:600;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .container{max-width:1120px; margin:0 auto; padding:0 28px;}
+
+  /* ---------- grid paper texture ---------- */
+  .grid-bg{
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+  .grid-bg-dark{
+    background-image:
+      linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(238,243,242,0.9);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--paper-line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:1120px; margin:0 auto;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-weight:700; font-size:1.15rem;
+  }
+  .logo-mark{
+    width:34px; height:34px; border-radius:8px;
+    background:var(--blueprint);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--amber); font-weight:700; font-size:0.95rem;
+  }
+  .nav-links{display:flex; gap:30px; font-size:0.95rem; font-weight:500;}
+  .nav-links a{opacity:0.75; transition:opacity .2s;}
+  .nav-links a:hover{opacity:1;}
+  .nav-cta{
+    background:var(--ink); color:var(--white); padding:10px 20px;
+    border-radius:100px; font-weight:600; font-size:0.9rem;
+    white-space:nowrap;
+  }
+  .menu-toggle{display:none; background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--ink);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:var(--blueprint-deep);
+    color:var(--white);
+    padding:100px 0 70px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .container{position:relative; z-index:2;}
+  .hero-tag{
+    color:var(--amber); font-family:'Chakra Petch'; font-size:0.8rem;
+    letter-spacing:0.2em; text-transform:uppercase; font-weight:600;
+    margin-bottom:18px; display:block;
+  }
+  .hero h1{
+    font-size:clamp(2.1rem, 5vw, 3.6rem);
+    font-weight:700; line-height:1.18; max-width:820px;
+    margin-bottom:22px;
+  }
+  .hero h1 span{color:var(--amber);}
+  .hero p{
+    max-width:560px; font-size:1.08rem; opacity:0.85; margin-bottom:34px;
+  }
+  .cta-row{display:flex; gap:16px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 26px; border-radius:100px; font-weight:600;
+    font-size:0.98rem; cursor:pointer; border:none;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:var(--amber); color:var(--blueprint-deep); box-shadow:0 6px 0 var(--amber-deep);}
+  .btn-primary:hover{box-shadow:0 8px 0 var(--amber-deep);}
+  .btn-ghost{border:1.5px solid rgba(255,255,255,0.35); color:var(--white); background:transparent;}
+  .btn-ghost:hover{border-color:var(--white);}
+
+  /* circuit diagram signature */
+  .circuit-wrap{
+    margin-top:64px; width:100%; max-width:900px;
+  }
+  .circuit-wrap svg{width:100%; height:auto; display:block;}
+  .node-label{
+    font-family:'Chakra Petch'; font-size:13px; fill:var(--white); font-weight:600;
+  }
+  .node-sub{
+    font-family:'Sarabun'; font-size:10.5px; fill:rgba(255,255,255,0.6);
+  }
+  .circuit-line{
+    stroke:var(--blueprint-light); stroke-width:2; fill:none;
+    stroke-dasharray:6 6;
+    animation:dash 40s linear infinite;
+  }
+  @keyframes dash{ to{ stroke-dashoffset:-1000; } }
+
+  /* ---------- section basics ---------- */
+  section{padding:88px 0;}
+  .section-head{max-width:640px; margin-bottom:56px;}
+  .section-head h2{
+    font-size:clamp(1.7rem, 3.4vw, 2.4rem); font-weight:700; margin-top:10px;
+  }
+  .section-head p{opacity:0.75; margin-top:14px; font-size:1.02rem;}
+
+  /* ---------- about ---------- */
+  .about{
+    display:grid; grid-template-columns:0.85fr 1.15fr; gap:60px; align-items:center;
+  }
+  .about-photo{
+    aspect-ratio:4/5; border-radius:18px;
+    background:linear-gradient(155deg, var(--blueprint) 0%, var(--blueprint-light) 100%);
+    position:relative; overflow:hidden;
+    display:flex; align-items:flex-end; padding:22px;
+  }
+  .about-photo::before{
+    content:"FIG. 00 — ผู้สอน";
+    position:absolute; top:18px; left:18px;
+    font-family:'Chakra Petch'; font-size:0.72rem; color:rgba(255,255,255,0.75);
+    letter-spacing:0.1em;
+  }
+  .about-photo span{
+    color:var(--white); font-family:'Chakra Petch'; font-size:0.85rem;
+    background:rgba(0,0,0,0.25); padding:8px 12px; border-radius:8px;
+  }
+  .about-body h3{font-size:1.6rem; margin:12px 0 16px; font-weight:700;}
+  .about-facts{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:28px;
+  }
+  .fact{
+    border-left:3px solid var(--amber); padding-left:14px;
+  }
+  .fact b{display:block; font-family:'Chakra Petch'; font-size:1.4rem;}
+  .fact span{font-size:0.85rem; opacity:0.65;}
+
+  /* ---------- courses ---------- */
+  .courses-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+  }
+  .course-card{
+    background:var(--white); border-radius:14px; padding:26px 22px;
+    position:relative; border:1px solid var(--paper-line);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .course-card:hover{transform:translateY(-5px); box-shadow:0 14px 30px rgba(20,35,43,0.1);}
+  .course-card::before, .course-card::after,
+  .corner-tl, .corner-br{
+    content:""; position:absolute; width:14px; height:14px; opacity:0.5;
+  }
+  .corner-tl{top:8px; left:8px; border-top:2px solid var(--blueprint-light); border-left:2px solid var(--blueprint-light);}
+  .corner-br{bottom:8px; right:8px; border-bottom:2px solid var(--blueprint-light); border-right:2px solid var(--blueprint-light);}
+  .course-letter{
+    width:44px; height:44px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Chakra Petch'; font-weight:700; font-size:1.3rem;
+    color:var(--white); margin-bottom:18px;
+  }
+  .course-card h4{font-size:1.1rem; font-weight:700; margin-bottom:8px;}
+  .course-card .age{
+    font-size:0.78rem; color:var(--blueprint); font-weight:600;
+    background:rgba(31,78,95,0.08); display:inline-block; padding:3px 10px;
+    border-radius:100px; margin-bottom:12px;
+  }
+  .course-card p{font-size:0.9rem; opacity:0.72;}
+
+  /* ---------- gallery ---------- */
+  .gallery{background:var(--ink); color:var(--white);}
+  .gallery .eyebrow{color:var(--amber);}
+  .gallery .section-head p{color:rgba(255,255,255,0.7);}
+  .gallery-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+  }
+  .gallery-item{
+    aspect-ratio:1; border-radius:12px; position:relative; overflow:hidden;
+    display:flex; align-items:flex-end; padding:14px;
+  }
+  .gallery-item span{
+    font-family:'Chakra Petch'; font-size:0.75rem; letter-spacing:0.05em;
+    background:rgba(0,0,0,0.35); padding:6px 10px; border-radius:6px;
+  }
+
+  /* ---------- testimonials ---------- */
+  .testimonial-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  .testimonial{
+    background:var(--white); border-radius:14px; padding:28px 24px;
+    border:1px solid var(--paper-line); position:relative;
+  }
+  .testimonial .quote-mark{
+    font-family:'Chakra Petch'; font-size:2.6rem; color:var(--amber);
+    line-height:1; margin-bottom:6px; display:block;
+  }
+  .testimonial p{font-size:0.95rem; opacity:0.85; margin-bottom:20px;}
+  .testimonial-author{display:flex; align-items:center; gap:12px;}
+  .avatar{
+    width:38px; height:38px; border-radius:50%; background:var(--blueprint-light);
+    flex-shrink:0;
+  }
+  .testimonial-author b{font-size:0.9rem; display:block;}
+  .testimonial-author span{font-size:0.78rem; opacity:0.6;}
+
+  /* ---------- schedule ---------- */
+  .schedule-table{
+    width:100%; border-collapse:collapse; background:var(--white);
+    border-radius:14px; overflow:hidden; border:1px solid var(--paper-line);
+  }
+  .schedule-table th{
+    font-family:'Chakra Petch'; font-size:0.78rem; letter-spacing:0.08em;
+    text-transform:uppercase; text-align:left; padding:16px 20px;
+    background:var(--blueprint-deep); color:var(--white); font-weight:600;
+  }
+  .schedule-table td{
+    padding:18px 20px; font-size:0.92rem; border-top:1px solid var(--paper-line);
+  }
+  .schedule-table tr:hover td{background:rgba(31,78,95,0.04);}
+  .price-tag{font-family:'Chakra Petch'; font-weight:600; color:var(--blueprint);}
+
+  /* ---------- contact ---------- */
+  .contact{
+    background:var(--blueprint-deep); color:var(--white); border-radius:24px;
+    padding:60px; display:grid; grid-template-columns:1fr 1fr; gap:50px;
+    margin:0 28px;
+  }
+  .contact-info .eyebrow{color:var(--amber);}
+  .contact-info h2{font-size:1.9rem; margin:12px 0 20px; font-weight:700;}
+  .contact-info p{opacity:0.75; margin-bottom:28px;}
+  .contact-detail{display:flex; gap:12px; margin-bottom:14px; font-size:0.95rem;}
+  .contact-detail b{color:var(--amber); font-family:'Chakra Petch'; min-width:70px; display:inline-block;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{font-size:0.82rem; opacity:0.7; display:block; margin-bottom:6px;}
+  .form-group input, .form-group textarea{
+    width:100%; background:rgba(255,255,255,0.06); border:1px dashed rgba(255,255,255,0.3);
+    border-radius:8px; padding:12px 14px; color:var(--white); font-family:'Sarabun';
+    font-size:0.92rem;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder{color:rgba(255,255,255,0.4);}
+
+  footer{
+    padding:36px 0; text-align:center; font-size:0.85rem; opacity:0.55;
+  }
+
+  /* ---------- reveal animation ---------- */
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    .reveal{transition:none; opacity:1; transform:none;}
+    .circuit-line{animation:none;}
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 880px){
+    .about{grid-template-columns:1fr;}
+    .courses-grid{grid-template-columns:repeat(2,1fr);}
+    .gallery-grid{grid-template-columns:repeat(2,1fr);}
+    .testimonial-grid{grid-template-columns:1fr;}
+    .contact{grid-template-columns:1fr; padding:36px 24px; margin:0 16px; border-radius:18px;}
+  }
+  @media (max-width: 640px){
+    .nav-links{
+      position:absolute; top:64px; left:0; right:0; background:var(--paper);
+      flex-direction:column; padding:20px 28px; gap:18px;
+      border-bottom:1px solid var(--paper-line);
+      display:none;
+    }
+    .nav-links.open{display:flex;}
+    .menu-toggle{display:block;}
+    .courses-grid{grid-template-columns:1fr;}
+    .gallery-grid{grid-template-columns:1fr 1fr;}
+    section{padding:60px 0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">
+      <div class="logo-mark">Fs</div>
+      FUSE STEM Studio
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">เกี่ยวกับเรา</a>
+      <a href="#courses">คอร์สเรียน</a>
+      <a href="#gallery">ผลงาน</a>
+      <a href="#schedule">ตาราง/ราคา</a>
+      <a href="#contact">ติดต่อ</a>
+    </div>
+    <a href="#contact" class="nav-cta">จองคลาสทดลอง</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="เปิดเมนู">☰</button>
+  </nav>
+</header>
+
+<section class="hero grid-bg-dark">
+  <div class="container">
+    <span class="hero-tag">STEM Studio · อายุ 7–15 ปี</span>
+    <h1>เชื่อมไอเดีย ต่อวงจรความคิด<br>ให้ลูกคุณ <span>ลงมือทำจริง</span></h1>
+    <p>ห้องเรียน STEM ขนาดเล็ก ที่ให้เด็กได้ทดลอง ประดิษฐ์ และแก้ปัญหาด้วยตัวเอง ผ่านวิทยาศาสตร์ เทคโนโลยี วิศวกรรม และคณิตศาสตร์ ในบรรยากาศสนุกแบบห้องแล็บจริง</p>
+    <div class="cta-row">
+      <a href="#contact" class="btn btn-primary">จองคลาสทดลองฟรี</a>
+      <a href="#courses" class="btn btn-ghost">ดูคอร์สเรียนทั้งหมด</a>
+    </div>
+
+    <div class="circuit-wrap">
+      <svg viewBox="0 0 860 200" xmlns="http://www.w3.org/2000/svg">
+        <path class="circuit-line" d="M60,160 L60,100 L220,100 L220,50 L400,50 L400,150 L580,150 L580,60 L760,60 L760,110 L800,110"/>
+        <circle cx="60" cy="160" r="7" fill="#4C9A6A"/>
+        <circle cx="220" cy="50" r="7" fill="#F2A93B"/>
+        <circle cx="400" cy="150" r="7" fill="#4A8CA0"/>
+        <circle cx="580" cy="60" r="7" fill="#F2A93B"/>
+        <circle cx="760" cy="110" r="7" fill="#4C9A6A"/>
+
+        <text x="60" y="185" class="node-label" text-anchor="middle">S</text>
+        <text x="60" y="198" class="node-sub" text-anchor="middle">Science</text>
+
+        <text x="220" y="35" class="node-label" text-anchor="middle">T</text>
+        <text x="220" y="22" class="node-sub" text-anchor="middle">Technology</text>
+
+        <text x="400" y="175" class="node-label" text-anchor="middle">E</text>
+        <text x="400" y="188" class="node-sub" text-anchor="middle">Engineering</text>
+
+        <text x="580" y="45" class="node-label" text-anchor="middle">M</text>
+        <text x="580" y="32" class="node-sub" text-anchor="middle">Math</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="grid-bg">
+  <div class="container about reveal">
+    <div class="about-photo">
+      <span>ครูปั้น · หัวหน้าห้องแล็บ</span>
+    </div>
+    <div class="about-body">
+      <span class="eyebrow">เกี่ยวกับผู้สอน</span>
+      <h3>8 ปีในห้องเรียน กว่า 40 ไอเดียที่กลายเป็นของจริง</h3>
+      <p>ครูปั้น จบวิศวกรรมเครื่องกล และสอน STEM ให้เด็กมากว่า 8 ปี เชื่อว่าเด็กเรียนรู้ได้ดีที่สุดเมื่อได้ลงมือทำ ไม่ใช่แค่ท่องจำสูตร ทุกคลาสเน้นให้นักเรียนตั้งคำถาม ทดลอง และแก้ปัญหาด้วยตัวเอง</p>
+      <div class="about-facts">
+        <div class="fact"><b>320+</b><span>นักเรียนที่ผ่านคอร์ส</span></div>
+        <div class="fact"><b>8 ปี</b><span>ประสบการณ์การสอน</span></div>
+        <div class="fact"><b>4</b><span>สาขาวิชา S-T-E-M</span></div>
+        <div class="fact"><b>4.9/5</b><span>คะแนนรีวิวผู้ปกครอง</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="courses" class="grid-bg">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">คอร์สเรียน</span>
+      <h2>4 โมดูล เชื่อมกันเป็นวงจรการเรียนรู้</h2>
+      <p>เลือกเรียนทีละโมดูล หรือเรียนครบชุดเพื่อสร้างพื้นฐาน STEM ที่แข็งแรง</p>
+    </div>
+    <div class="courses-grid reveal">
+      <div class="course-card">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="course-letter" style="background:#4C9A6A;">S</div>
+        <span class="age">อายุ 7–10 ปี</span>
+        <h4>วิทยาศาสตร์ทดลอง</h4>
+        <p>ทดลองจริงทุกสัปดาห์ ตั้งแต่ภูเขาไฟจำลองไปจนถึงการกรองน้ำสะอาด</p>
+      </div>
+      <div class="course-card">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="course-letter" style="background:#4A8CA0;">T</div>
+        <span class="age">อายุ 9–13 ปี</span>
+        <h4>เขียนโค้ดกับหุ่นยนต์</h4>
+        <p>เริ่มจาก block coding สู่การเขียนโปรแกรมควบคุมหุ่นยนต์ตัวแรกของตัวเอง</p>
+      </div>
+      <div class="course-card">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="course-letter" style="background:#F2A93B;">E</div>
+        <span class="age">อายุ 10–15 ปี</span>
+        <h4>วิศวกรรมสร้างสรรค์</h4>
+        <p>ออกแบบและสร้างโครงสร้าง สะพาน และเครื่องกลอย่างง่ายด้วยมือตัวเอง</p>
+      </div>
+      <div class="course-card">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="course-letter" style="background:#1F4E5F;">M</div>
+        <span class="age">อายุ 8–14 ปี</span>
+        <h4>คณิตศาสตร์เชิงตรรกะ</h4>
+        <p>ฝึกแก้โจทย์แนวโอลิมปิกผ่านเกมและปริศนา สนุกกว่าการท่องสูตร</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="gallery grid-bg-dark">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">ผลงานนักเรียน</span>
+      <h2>จากกระดาษร่าง สู่ของจริง</h2>
+      <p>ตัวอย่างผลงานและกิจกรรมจากคลาสที่ผ่านมา</p>
+    </div>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item" style="background:linear-gradient(155deg,#4C9A6A,#1F4E5F);"><span>FIG.01 — ภูเขาไฟจำลอง</span></div>
+      <div class="gallery-item" style="background:linear-gradient(155deg,#4A8CA0,#123241);"><span>FIG.02 — หุ่นยนต์ตัวแรก</span></div>
+      <div class="gallery-item" style="background:linear-gradient(155deg,#F2A93B,#1F4E5F);"><span>FIG.03 — สะพานรับน้ำหนัก</span></div>
+      <div class="gallery-item" style="background:linear-gradient(155deg,#1F4E5F,#4C9A6A);"><span>FIG.04 — เกมคณิตศาสตร์</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="grid-bg">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">เสียงจากผู้ปกครอง</span>
+      <h2>สิ่งที่ผู้ปกครองพูดถึงเรา</h2>
+    </div>
+    <div class="testimonial-grid reveal">
+      <div class="testimonial">
+        <span class="quote-mark">"</span>
+        <p>ลูกเปลี่ยนจากไม่ชอบวิทย์เลย มาเป็นรอวันเสาร์เพื่อไปแล็บทุกสัปดาห์ ครูปั้นอธิบายสนุกและใจเย็นมากค่ะ</p>
+        <div class="testimonial-author">
+          <div class="avatar"></div>
+          <div><b>คุณแม่ของน้องพลอย</b><span>ผู้ปกครอง อายุ 9 ปี</span></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <span class="quote-mark">"</span>
+        <p>คอร์สหุ่นยนต์ทำให้ลูกกล้าลองผิดลองถูกมากขึ้น ไม่กลัวความล้มเหลวเหมือนก่อน</p>
+        <div class="testimonial-author">
+          <div class="avatar"></div>
+          <div><b>คุณพ่อของน้องภูมิ</b><span>ผู้ปกครอง อายุ 11 ปี</span></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <span class="quote-mark">"</span>
+        <p>ห้องเรียนเล็ก ดูแลทั่วถึง เห็นพัฒนาการชัดเจนภายใน 2 เดือน แนะนำเพื่อนต่อเลยค่ะ</p>
+        <div class="testimonial-author">
+          <div class="avatar"></div>
+          <div><b>คุณแม่ของน้องมิว</b><span>ผู้ปกครอง อายุ 13 ปี</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="schedule" class="grid-bg">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">ตารางเรียนและราคา</span>
+      <h2>เลือกวันเวลาที่สะดวก</h2>
+      <p>คลาสละ 1.5 ชั่วโมง กลุ่มละไม่เกิน 8 คน</p>
+    </div>
+    <div style="overflow-x:auto;" class="reveal">
+      <table class="schedule-table">
+        <thead>
+          <tr><th>คอร์ส</th><th>วัน/เวลา</th><th>จำนวนครั้ง</th><th>ราคา</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>วิทยาศาสตร์ทดลอง (S)</td><td>เสาร์ 9:00–10:30</td><td>8 ครั้ง / เดือน</td><td class="price-tag">2,400 บาท</td></tr>
+          <tr><td>เขียนโค้ดกับหุ่นยนต์ (T)</td><td>เสาร์ 13:00–14:30</td><td>8 ครั้ง / เดือน</td><td class="price-tag">2,800 บาท</td></tr>
+          <tr><td>วิศวกรรมสร้างสรรค์ (E)</td><td>อาทิตย์ 9:00–10:30</td><td>8 ครั้ง / เดือน</td><td class="price-tag">2,600 บาท</td></tr>
+          <tr><td>คณิตศาสตร์เชิงตรรกะ (M)</td><td>อาทิตย์ 13:00–14:30</td><td>8 ครั้ง / เดือน</td><td class="price-tag">2,200 บาท</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="contact reveal grid-bg-dark">
+    <div class="contact-info">
+      <span class="eyebrow">ติดต่อเรา</span>
+      <h2>เริ่มต้นวงจรการเรียนรู้ของลูกคุณวันนี้</h2>
+      <p>ทักไลน์หรือโทรมาได้เลย ทีมงานจะช่วยแนะนำคอร์สที่เหมาะกับช่วงวัยของลูกคุณ</p>
+      <div class="contact-detail"><b>โทร</b><span>08X-XXX-XXXX</span></div>
+      <div class="contact-detail"><b>LINE</b><span>@fusestem (ตัวอย่าง)</span></div>
+      <div class="contact-detail"><b>ที่อยู่</b><span>ซอยตัวอย่าง 12 เขตตัวอย่าง กรุงเทพฯ</span></div>
+      <div class="contact-detail"><b>เวลาทำการ</b><span>อังคาร–อาทิตย์ 9:00–17:00</span></div>
+    </div>
+    <form onsubmit="event.preventDefault(); alert('นี่คือหน้าตัวอย่างข้อมูลจำลอง — ฟอร์มยังไม่เชื่อมต่อจริง');">
+      <div class="form-group">
+        <label>ชื่อผู้ปกครอง</label>
+        <input type="text" placeholder="เช่น คุณสมชาย ใจดี">
+      </div>
+      <div class="form-group">
+        <label>เบอร์โทรติดต่อกลับ</label>
+        <input type="text" placeholder="08X-XXX-XXXX">
+      </div>
+      <div class="form-group">
+        <label>สนใจคอร์สไหน</label>
+        <input type="text" placeholder="เช่น เขียนโค้ดกับหุ่นยนต์">
+      </div>
+      <div class="form-group">
+        <label>ข้อความเพิ่มเติม</label>
+        <textarea rows="3" placeholder="อายุลูก / วันเวลาที่สะดวก"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; border:none;">ส่งข้อมูล</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    © 2026 FUSE STEM Studio — เนื้อหาทั้งหมดในหน้านี้เป็นข้อมูลจำลองเพื่อการออกแบบตัวอย่าง
+  </div>
+</footer>
+
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+  menuToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  }, {threshold:0.12});
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
